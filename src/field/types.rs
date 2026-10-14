@@ -33,6 +33,7 @@ pub enum FieldType {
     //General,
     //BinaryCharacter,
     //BinaryMemo,
+    NullFlags,
 }
 
 impl From<FieldType> for u8 {
@@ -48,6 +49,7 @@ impl From<FieldType> for u8 {
             FieldType::Integer => 'I',
             FieldType::Double => 'B',
             FieldType::Memo => 'M',
+            FieldType::NullFlags => '0',
         };
         v as u8
     }
@@ -74,6 +76,7 @@ impl FieldType {
             //'G' => Some(FieldType::General),
             //'C' => Some(FieldType::BinaryCharacter), ??
             //'M' => Some(FieldType::BinaryMemo),
+            '0' => Some(FieldType::NullFlags),
             _ => None,
         }
     }
@@ -143,6 +146,9 @@ pub enum FieldValue {
     /// These strings are stored in an external file
     /// called the `Memo file`
     Memo(String),
+
+    /// a hidden system field added automatically to a DBF table or cursor whenever any of its columns allow NULL values
+    NullFlags(Vec<u8>),
 }
 
 impl FieldValue {
@@ -261,6 +267,9 @@ impl FieldValue {
                     return Err(ErrorKind::MissingMemoFile);
                 }
             }
+            FieldType::NullFlags => {
+                FieldValue::NullFlags(field_bytes.to_vec())
+            }
         };
         Ok(value)
     }
@@ -278,6 +287,7 @@ impl FieldValue {
             FieldValue::Memo(_) => FieldType::Memo,
             FieldValue::Currency(_) => FieldType::Currency,
             FieldValue::DateTime(_) => FieldType::DateTime,
+            FieldValue::NullFlags(_) => FieldType::NullFlags,
         }
     }
 }
@@ -708,6 +718,9 @@ impl WritableAsDbaseField for FieldValue {
                 FieldValue::Double(value) => value.write_as(field_info, encoding, dst),
                 FieldValue::Memo(_) => Err(ErrorKind::Message(
                     "Writing memo fields is not supported".to_string(),
+                )),
+                FieldValue::NullFlags(_) => Err(ErrorKind::Message(
+                    "Writing NullFlags fields is not supported".to_string(),
                 )),
             }
         }
