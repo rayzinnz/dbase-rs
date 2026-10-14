@@ -681,6 +681,12 @@ impl DateTime {
     }
 }
 
+impl Display for DateTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:04}-{:02}-{:02} {:02}:{:02}:{:02}", self.date.year, self.date.month, self.date.day, self.time.hours, self.time.minutes, self.time.seconds)
+    }
+}
+
 #[cfg(feature = "chrono")]
 impl From<DateTime> for NaiveDateTime {
     fn from(value: DateTime) -> Self {
@@ -1255,5 +1261,11 @@ mod test {
     fn test_to_unix_timestamp() {
         let datetime = DateTime::new(Date::new(1, 1, 1970).unwrap(), Time::new(1, 1, 1).unwrap());
         assert_eq!(datetime.to_unix_timestamp(), 3661);
+    }
+
+    #[test]
+    fn test_datetime_to_string() {
+        let datetime = DateTime::new(Date::new(1, 1, 1970).unwrap(), Time::new(1, 1, 1).unwrap());
+        assert_eq!(datetime.to_string(), "1970-01-01 01:01:01");
     }
 }
