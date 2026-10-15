@@ -294,7 +294,21 @@ impl FieldValue {
 
 impl Display for FieldValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{self:?}")
+        write!(f, "{}",
+            match self {
+                FieldValue::Character(v) => format!("\"{}\"", match v { Some(v) => v.to_string(), None => String::new() }),
+                FieldValue::Currency(v) => v.to_string(),
+                FieldValue::Date(v) => match v { Some(v) => v.to_string(), None => String::new() },
+                FieldValue::DateTime(v) => format!("{}", v),
+                FieldValue::Double(v) => v.to_string(),
+                FieldValue::Float(v) => match v { Some(v) => v.to_string(), None => String::new() },
+                FieldValue::Integer(v) => v.to_string(),
+                FieldValue::Logical(v) => match v { Some(v) => v.to_string(), None => String::new() },
+                FieldValue::Memo(v) => format!("\"{}\"", v.replace("\"", "\"\"")),
+                FieldValue::NullFlags(v) => format!("{:?}", v),
+                FieldValue::Numeric(v) => match v { Some(v) => v.to_string(), None => String::new() },
+            }
+        )
     }
 }
 
@@ -473,7 +487,7 @@ impl FromStr for Date {
 
 impl Display for Date {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:04}{:02}{:02}", self.year, self.month, self.day)
+        write!(f, "{:04}-{:02}-{:02}", self.year, self.month, self.day)
     }
 }
 
