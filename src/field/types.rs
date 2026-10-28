@@ -296,7 +296,7 @@ impl Display for FieldValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}",
             match self {
-                FieldValue::Character(v) => format!("\"{}\"", match v { Some(v) => v.to_string(), None => String::new() }),
+                FieldValue::Character(v) => match v { Some(v) => v.to_string(), None => String::new() },
                 FieldValue::Currency(v) => v.to_string(),
                 FieldValue::Date(v) => match v { Some(v) => v.to_string(), None => String::new() },
                 FieldValue::DateTime(v) => format!("{}", v),
@@ -304,7 +304,7 @@ impl Display for FieldValue {
                 FieldValue::Float(v) => match v { Some(v) => v.to_string(), None => String::new() },
                 FieldValue::Integer(v) => v.to_string(),
                 FieldValue::Logical(v) => match v { Some(v) => v.to_string(), None => String::new() },
-                FieldValue::Memo(v) => format!("\"{}\"", v.replace("\"", "\"\"")),
+                FieldValue::Memo(v) => v.to_string(),
                 FieldValue::NullFlags(v) => format!("{:?}", v),
                 FieldValue::Numeric(v) => match v { Some(v) => v.to_string(), None => String::new() },
             }
